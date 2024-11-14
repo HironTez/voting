@@ -159,19 +159,24 @@ export default function Home() {
     const index = entries.indexOf(entry);
 
     setEntry(null, entry.id);
-    toast(`Удалено: ${entry.text.slice(0, 10)}`, {
-      action: {
-        label: "Отменить",
-        onClick: async () => {
-          setEntries((entries) => addAt(entries, index, entry));
+    toast(
+      `Удалено${entry.text && ": "}${
+        entry.text.length > 25 ? `${entry.text.slice(0, 25)}...` : entry.text
+      }`,
+      {
+        action: {
+          label: "Отменить",
+          onClick: async () => {
+            setEntries((entries) => addAt(entries, index, entry));
+          },
         },
-      },
-      onAutoClose: async () => {
-        autoLoading(async () => {
-          await deleteEntry(entry.id);
-        });
-      },
-    });
+        onAutoClose: async () => {
+          autoLoading(async () => {
+            await deleteEntry(entry.id);
+          });
+        },
+      }
+    );
   };
   const handleAddEntry = async () => {
     autoLoading(async () => {
