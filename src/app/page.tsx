@@ -133,6 +133,10 @@ export default function Home() {
       setCookie(usernameTag, username);
     });
   };
+  const handleUsernameChangeDebounced = useDebouncedCallback(
+    handleUsernameChange,
+    2000
+  );
 
   const onUsernameValueChange = async (value: string) => {
     const prevUsername = username;
@@ -146,6 +150,8 @@ export default function Home() {
           : entry
       )
     );
+
+    if (!prevUsername) await handleUsernameChangeDebounced(value, prevUsername);
   };
   const onUsernameFocusChange = async (isFocused: boolean) => {
     if (!isFocused) {
