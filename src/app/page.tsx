@@ -213,7 +213,7 @@ export default function Home() {
 
   return (
     <div className="flex items-center justify-center">
-      <main className="max-w-[500] w-full flex flex-col gap-5 p-5">
+      <main className="max-w-[500px] w-full flex flex-col gap-5 p-5">
         <LinearProgress
           indeterminate
           className={loading ? "visible" : "invisible"}
