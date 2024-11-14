@@ -1,10 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { socket, socketChannels } from "@/lib/subscription";
+import { ablyRestClient } from "@/lib/subscription/server";
+import { socketChannels } from "@/lib/subscription/channels";
 
 const sendUpdateMessage = async (id: string) => {
-  const channel = socket.channels.get(socketChannels.voting.name);
+  const channel = ablyRestClient.channels.get(socketChannels.voting.name);
   await channel.publish(socketChannels.voting.events.update, id);
 };
 

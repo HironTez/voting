@@ -1,7 +1,7 @@
 "use client";
 
 import { useChannel } from "ably/react";
-import { socketChannels } from "@/lib/subscription";
+import { socketChannels } from "@/lib/subscription/channels";
 import { useEffect, useState } from "react";
 import {
   addEntry,
