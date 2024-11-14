@@ -1,0 +1,138 @@
+:root,
+:host {
+  --md-sys-color-background: 255 255 255;
+  --md-sys-color-on-background: 66 64 60;
+  --md-sys-color-surface-container-highest: 224 206 184;
+  --md-sys-color-on-surface: 66 64 60;
+  --md-sys-color-on-surface-variant: 87 77 63;
+  --md-sys-color-inverse-surface: 247 235 220;
+  --md-sys-color-outline: 157 143 123;
+  --md-sys-color-primary: 186 153 102;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  :host {
+    --md-sys-color-background: 24 19 11;
+    --md-sys-color-on-background: 237 225 211;
+    --md-sys-color-surface: 24 19 11;
+    --md-sys-color-surface-dim: 24 19 11;
+    --md-sys-color-surface-bright: 63 56 47;
+    --md-sys-color-surface-container-lowest: 18 13 6;
+    --md-sys-color-surface-container-low: 32 27 18;
+    --md-sys-color-surface-container: 37 31 22;
+    --md-sys-color-surface-container-high: 47 41 32;
+    --md-sys-color-surface-container-highest: 59 52 42;
+    --md-sys-color-on-surface: 237 225 211;
+    --md-sys-color-surface-variant: 80 69 52;
+    --md-sys-color-on-surface-variant: 213 196 174;
+    --md-sys-color-inverse-surface: 75 62 47;
+    --md-sys-color-inverse-on-surface: 54 47 38;
+    --md-sys-color-outline: 157 143 123;
+    --md-sys-color-outline-variant: 80 69 52;
+    --md-sys-color-shadow: 0 0 0;
+    --md-sys-color-scrim: 0 0 0;
+    --md-sys-color-surface-tint: 255 186 62;
+    --md-sys-color-primary: 255 210 141;
+    --md-sys-color-on-primary: 67 44 0;
+    --md-sys-color-primary-container: 229 164 39;
+    --md-sys-color-on-primary-container: 52 33 0;
+    --md-sys-color-inverse-primary: 127 87 0;
+    --md-sys-color-secondary: 230 193 136;
+    --md-sys-color-on-secondary: 67 44 2;
+    --md-sys-color-secondary-container: 84 59 15;
+    --md-sys-color-on-secondary-container: 245 207 149;
+    --md-sys-color-tertiary: 206 227 106;
+    --md-sys-color-on-tertiary: 44 52 0;
+    --md-sys-color-tertiary-container: 165 185 69;
+    --md-sys-color-on-tertiary-container: 33 40 0;
+    --md-sys-color-error: 255 180 171;
+    --md-sys-color-on-error: 105 0 5;
+    --md-sys-color-error-container: 147 0 10;
+    --md-sys-color-on-error-container: 255 218 214;
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  background-color: rgb(var(--md-sys-color-background));
+  color: rgb(var(--md-sys-color-on-background));
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+textarea {
+  width: 100%;
+  background-color: unset;
+  outline: none;
+}
+
+/* :root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+} */
