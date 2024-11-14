@@ -267,13 +267,14 @@ export default function Home() {
                   <div className="flex justify-between">
                     <div>
                       <p>Автор: {entry.createdBy.username}</p>
-                      {/* {entry.updatedBy &&
+                      {entry.updatedBy &&
                         entry.updatedBy.id !== entry.createdBy.id && (
                           <p>
-                            Изменил(а): {entry.updatedBy?.username} (
-                            {moment(entry.updatedAt).format("HH:mm DD.MM.YY")})
+                            Изменил(а): {entry.updatedBy?.username}
+                            {/* {" "}(
+                            {moment(entry.updatedAt).format("HH:mm DD.MM.YY")}) */}
                           </p>
-                        )} */}
+                        )}
                       <p>За: {entry.voters.length}</p>
                     </div>
                     <div className="flex gap-1">
