@@ -19,10 +19,17 @@ import { addAt, removeAt, replaceAt } from "@/lib/utils";
 import { Message } from "ably";
 import { useDebouncedCallback } from "use-debounce";
 // import moment from "moment";
-import { Button, Card, IconButton, LinearProgress, TextField } from "actify";
+import {
+  Button,
+  Card,
+  IconButton,
+  LinearProgress,
+  TextField,
+  Icon,
+} from "actify";
 import { useAutosize } from "@/lib/utils/hooks";
 import { Toaster, toast } from "sonner";
-import { Icon } from "@/app/components/icon";
+// import { Icon } from "@/app/components/icon";
 
 const getEmptyEntry = (username: string) => ({
   id: "",
