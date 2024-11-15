@@ -67,15 +67,23 @@ export const upsertUsername = async (
   username: string,
   prevUsername: string
 ) => {
+  if (username == prevUsername) return { success: true };
+
   const existing = await prisma.user.findUnique({ where: { username } });
-  if (existing) {
-    return existing;
-  }
-  return await prisma.user.upsert({
-    create: { username },
-    update: { username },
-    where: { username: prevUsername },
-  });
+  if (existing) return { success: false, error: "Это имя уже занято" };
+
+  return await prisma.user
+    .upsert({
+      create: { username },
+      update: { username },
+      where: { username: prevUsername },
+    })
+    .then((user) =>
+      user.username === username
+        ? { success: true }
+        : { success: false, error: "Не удалось изменить имя" }
+    )
+    .catch(() => ({ success: false, error: "Не удалось изменить имя" }));
 };
 
 export const voteForEntry = async (entryId: string, username: string) => {

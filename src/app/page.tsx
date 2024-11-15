@@ -61,10 +61,12 @@ export default function Home() {
 
   const usernameTag = "username";
   const [cookies, setCookie] = useCookies([usernameTag]);
+  const cookieUsername = (cookies.username as string | undefined) ?? "";
 
-  const [username, setUsername] = useState(
-    (cookies.username as string | undefined) ?? ""
-  );
+  const [username, setUsername] = useState(cookieUsername);
+  const [usernameErrorMessage, setUsernameErrorMessage] = useState<
+    string | undefined
+  >();
   const [entries, setEntries] = useState<Entry[]>([]);
 
   const setEntry = (entry: Entry | null, id: string) => {
@@ -86,6 +88,18 @@ export default function Home() {
   const getEntry = async (id: string) => {
     setEntry(await fetchEntry(id), id);
   };
+
+  // const setUsernameInEntries = (username: string, prevUsername: string) => {
+  //   setEntries((entries) =>
+  //     entries.map((entry) =>
+  //       entry.createdBy.username === prevUsername
+  //         ? { ...entry, createdBy: { ...entry.createdBy, username } }
+  //         : entry.updatedBy?.username === prevUsername
+  //         ? { ...entry, updatedBy: { ...entry.updatedBy, username } }
+  //         : entry
+  //     )
+  //   );
+  // };
 
   useEffect(() => {
     autoLoading(getEntries);
@@ -121,14 +135,20 @@ export default function Home() {
     onUpdateMessage
   );
 
-  const handleUsernameChange = async (
-    username: string,
-    prevUsername: string
-  ) => {
-    if (!username) return;
+  const handleUsernameChange = async (username: string) => {
+    if (!username || username == cookieUsername) {
+      setUsernameErrorMessage(undefined);
+      return;
+    }
 
     autoLoading(async () => {
-      await upsertUsername(username, prevUsername);
+      const result = await upsertUsername(username, cookieUsername);
+      if (result.success && usernameErrorMessage !== undefined) {
+        setUsernameErrorMessage(undefined);
+      } else if (!result.success) {
+        setUsernameErrorMessage(result.error);
+        return;
+      }
 
       await getEntries();
       setCookie(usernameTag, username);
@@ -140,25 +160,15 @@ export default function Home() {
   );
 
   const onUsernameValueChange = async (value: string) => {
-    const prevUsername = username;
     setUsername(value);
-    setEntries((entries) =>
-      entries.map((entry) =>
-        entry.createdBy.username === prevUsername
-          ? { ...entry, createdBy: { ...entry.createdBy, username: value } }
-          : entry.updatedBy?.username === prevUsername
-          ? { ...entry, updatedBy: { ...entry.updatedBy, username: value } }
-          : entry
-      )
-    );
 
-    await handleUsernameChangeDebounced(value, prevUsername);
+    await handleUsernameChangeDebounced(value);
   };
 
   const handleUpdateEntry = useDebouncedCallback(
     async (id: string, value: string) => {
       autoLoading(async () => {
-        await updateEntry(id, value, username);
+        await updateEntry(id, value, cookieUsername);
       });
     },
     3000
@@ -189,7 +199,7 @@ export default function Home() {
   const handleAddEntry = async () => {
     autoLoading(async () => {
       setEntry(getEmptyEntry(username), "");
-      await addEntry("", username);
+      await addEntry("", cookieUsername);
     });
   };
   const handleToggleVote = async (
@@ -206,7 +216,7 @@ export default function Home() {
           },
           id
         );
-        await retractVoteForEntry(id, username);
+        await retractVoteForEntry(id, cookieUsername);
       } else {
         setEntry(
           {
@@ -219,7 +229,7 @@ export default function Home() {
           },
           id
         );
-        await voteForEntry(id, username);
+        await voteForEntry(id, cookieUsername);
       }
     });
   };
@@ -240,6 +250,7 @@ export default function Home() {
           onChange={onUsernameValueChange}
           variant="outlined"
           isDisabled={!!loading}
+          description={usernameErrorMessage}
         />
 
         <div
