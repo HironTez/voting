@@ -2,7 +2,7 @@
 
 import { useChannel } from "ably/react";
 import { socketChannels } from "@/lib/subscription/channels";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   addEntry,
   deleteEntry,
@@ -15,7 +15,13 @@ import {
 } from "./serverActions";
 import { useCookies } from "react-cookie";
 import { Prisma } from "@prisma/client";
-import { addAt, removeAt, replaceAt, truncateText } from "@/lib/utils";
+import {
+  addAt,
+  calculateIndexToRestore,
+  removeAt,
+  replaceAt,
+  truncateText,
+} from "@/lib/utils";
 import { Message } from "ably";
 import { useDebouncedCallback } from "use-debounce";
 import {
@@ -67,17 +73,54 @@ export default function Home() {
     string | undefined
   >();
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [deletedEntries, setDeletedEntries] = useState<
+    { entry: Entry; originalIndex: number }[]
+  >([]);
 
-  const setEntry = (entry: Entry | null, id: string) => {
-    const index = entries.findIndex((e) => e.id === id || e.id === "");
+  // Use ref as a storage for the latest value of entries and deleted entries to
+  // avoid it being captured in an old state in a callback function
+  const entriesRef = useRef<Entry[]>([]);
+  entriesRef.current = entries;
+  const deletedEntriesRef = useRef<{ entry: Entry; originalIndex: number }[]>(
+    []
+  );
+  deletedEntriesRef.current = deletedEntries;
+
+  const setEntry = (entry: Entry | null, id: string, restore = false) => {
+    const index = entriesRef.current.findIndex(
+      (e) => e.id === id || e.id === ""
+    );
     if (index >= 0) {
       if (entry) {
-        setEntries(replaceAt(entries, index, entry));
+        setEntries((entries) => replaceAt(entries, index, entry));
       } else {
-        setEntries(removeAt(entries, index));
+        const entry = entriesRef.current[index];
+        setEntries((entries) => removeAt(entries, index));
+        setDeletedEntries((deletedEntries) =>
+          deletedEntries.concat({ entry, originalIndex: index })
+        );
       }
     } else if (entry) {
-      setEntries([...entries, entry]);
+      setEntries((entries) => [...entries, entry]);
+    } else if (restore) {
+      const deletedEntryIndex = deletedEntriesRef.current.findIndex(
+        (deletedEntry) => deletedEntry.entry.id === id
+      );
+      if (deletedEntryIndex < 0) return;
+
+      const deletedEntry = deletedEntriesRef.current[deletedEntryIndex];
+
+      const newDeletedEntries = removeAt(
+        deletedEntriesRef.current,
+        deletedEntryIndex
+      );
+      const newIndex = calculateIndexToRestore(
+        deletedEntry.originalIndex,
+        newDeletedEntries.map((e) => e.originalIndex)
+      );
+
+      setEntries((entries) => addAt(entries, newIndex, deletedEntry.entry));
+      setDeletedEntries(newDeletedEntries);
     }
   };
 
@@ -161,7 +204,6 @@ export default function Home() {
     3000
   );
   const handleDeleteEntry = async (entry: Entry) => {
-    const index = entries.indexOf(entry);
     const toastMessageSuffix = entry.text && `: ${truncateText(entry.text)}`;
     const toastMessage = `Удалено${toastMessageSuffix || " пустую запись"}`;
 
@@ -170,7 +212,7 @@ export default function Home() {
       action: {
         label: "Отменить",
         onClick: async () => {
-          setEntries((entries) => addAt(entries, index, entry));
+          setEntry(null, entry.id, true);
         },
       },
       onAutoClose: async () => {
@@ -242,7 +284,7 @@ export default function Home() {
             username ? "visible" : "invisible"
           }`}
         >
-          {entries.map((entry, index) => {
+          {entries.map((entry) => {
             const hasVotedForEntry = entry.voters.some(
               (voter) => voter.username === username
             );
@@ -255,11 +297,12 @@ export default function Home() {
                       type="textarea"
                       value={entry.text}
                       onChange={(value: string) => {
-                        setEntries((entries) =>
-                          replaceAt(entries, index, {
+                        setEntry(
+                          {
                             ...entry,
                             text: value,
-                          })
+                          },
+                          entry.id
                         );
                         handleUpdateEntry(entry.id, value);
                       }}

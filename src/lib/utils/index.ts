@@ -23,10 +23,18 @@ export const addAt = <T>(array: T[], index: number, value: T) => {
 export const truncateText = (text: string, maxLength = 25) =>
   text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 
-// export const wait = async (ms: number) => {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       resolve(undefined);
-//     }, ms);
-//   });
-// };
+export const calculateIndexToRestore = (
+  originalIndex: number,
+  deletedIndexes: number[]
+) => {
+  if (!deletedIndexes.length) return originalIndex;
+
+  let shiftLeft = 0;
+  for (const deletedIndex of deletedIndexes) {
+    if (deletedIndex < originalIndex) {
+      shiftLeft++;
+    }
+  }
+
+  return originalIndex - shiftLeft;
+};
