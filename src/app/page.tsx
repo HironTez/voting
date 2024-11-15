@@ -125,6 +125,8 @@ export default function Home() {
     username: string,
     prevUsername: string
   ) => {
+    if (!username) return;
+
     autoLoading(async () => {
       await upsertUsername(username, prevUsername);
 
