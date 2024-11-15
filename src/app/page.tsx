@@ -18,7 +18,6 @@ import { Prisma } from "@prisma/client";
 import { addAt, removeAt, replaceAt } from "@/lib/utils";
 import { Message } from "ably";
 import { useDebouncedCallback } from "use-debounce";
-// import moment from "moment";
 import {
   Button,
   Card,
@@ -88,18 +87,6 @@ export default function Home() {
   const getEntry = async (id: string) => {
     setEntry(await fetchEntry(id), id);
   };
-
-  // const setUsernameInEntries = (username: string, prevUsername: string) => {
-  //   setEntries((entries) =>
-  //     entries.map((entry) =>
-  //       entry.createdBy.username === prevUsername
-  //         ? { ...entry, createdBy: { ...entry.createdBy, username } }
-  //         : entry.updatedBy?.username === prevUsername
-  //         ? { ...entry, updatedBy: { ...entry.updatedBy, username } }
-  //         : entry
-  //     )
-  //   );
-  // };
 
   useEffect(() => {
     autoLoading(getEntries);
