@@ -20,6 +20,9 @@ export const addAt = <T>(array: T[], index: number, value: T) => {
   return array.slice(0, index).concat(value).concat(array.slice(index));
 };
 
+export const truncateText = (text: string, maxLength = 25) =>
+  text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+
 // export const wait = async (ms: number) => {
 //   return new Promise((resolve, reject) => {
 //     setTimeout(() => {

@@ -15,7 +15,7 @@ import {
 } from "./serverActions";
 import { useCookies } from "react-cookie";
 import { Prisma } from "@prisma/client";
-import { addAt, removeAt, replaceAt } from "@/lib/utils";
+import { addAt, removeAt, replaceAt, truncateText } from "@/lib/utils";
 import { Message } from "ably";
 import { useDebouncedCallback } from "use-debounce";
 import {
@@ -162,26 +162,23 @@ export default function Home() {
   );
   const handleDeleteEntry = async (entry: Entry) => {
     const index = entries.indexOf(entry);
+    const toastMessageSuffix = entry.text && `: ${truncateText(entry.text)}`;
+    const toastMessage = `Удалено${toastMessageSuffix || " пустую запись"}`;
 
     setEntry(null, entry.id);
-    toast(
-      `Удалено${entry.text && ": "}${
-        entry.text.length > 25 ? `${entry.text.slice(0, 25)}...` : entry.text
-      }`,
-      {
-        action: {
-          label: "Отменить",
-          onClick: async () => {
-            setEntries((entries) => addAt(entries, index, entry));
-          },
+    toast(toastMessage, {
+      action: {
+        label: "Отменить",
+        onClick: async () => {
+          setEntries((entries) => addAt(entries, index, entry));
         },
-        onAutoClose: async () => {
-          autoLoading(async () => {
-            await deleteEntry(entry.id);
-          });
-        },
-      }
-    );
+      },
+      onAutoClose: async () => {
+        autoLoading(async () => {
+          await deleteEntry(entry.id);
+        });
+      },
+    });
   };
   const handleAddEntry = async () => {
     autoLoading(async () => {
