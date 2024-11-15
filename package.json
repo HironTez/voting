@@ -11,6 +11,7 @@
     "studio": "prisma studio"
   },
   "dependencies": {
+    "@fluentui/react-icons": "^2.0.265",
     "@prisma/client": "^5.22.0",
     "ably": "^2.5.0",
     "actify": "^0.3.4",

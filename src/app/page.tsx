@@ -24,16 +24,15 @@ import {
 } from "@/lib/utils";
 import { Message } from "ably";
 import { useDebouncedCallback } from "use-debounce";
-import {
-  Button,
-  Card,
-  IconButton,
-  LinearProgress,
-  TextField,
-  Icon,
-} from "actify";
+import { Button, Card, IconButton, LinearProgress, TextField } from "actify";
 import { useAutosize } from "@/lib/utils/hooks";
 import { Toaster, toast } from "sonner";
+import {
+  Heart24Regular,
+  Heart24Filled,
+  Delete24Regular,
+  Add24Regular,
+} from "@fluentui/react-icons";
 
 const getEmptyEntry = (username: string) => ({
   id: "",
@@ -280,7 +279,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center size-full">
       <main className="max-w-[500px] w-full flex flex-col gap-5 p-5">
         <LinearProgress
           indeterminate
@@ -343,15 +342,17 @@ export default function Home() {
                         }
                         isDisabled={!!loading}
                       >
-                        <Icon style={{ fill: "1" }} fill={hasVotedForEntry}>
-                          favorite
-                        </Icon>
+                        {hasVotedForEntry ? (
+                          <Heart24Filled />
+                        ) : (
+                          <Heart24Regular />
+                        )}
                       </IconButton>
                       <IconButton
                         onPress={() => handleDeleteEntry(entry)}
                         isDisabled={!!loading}
                       >
-                        <Icon>delete</Icon>
+                        <Delete24Regular />
                       </IconButton>
                     </div>
                   </div>
@@ -366,7 +367,7 @@ export default function Home() {
             className="w-full"
             isDisabled={!!loading}
           >
-            <Icon>add</Icon>
+            <Add24Regular />
           </Button>
         </div>
       </main>
