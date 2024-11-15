@@ -29,7 +29,6 @@ import {
 } from "actify";
 import { useAutosize } from "@/lib/utils/hooks";
 import { Toaster, toast } from "sonner";
-// import { Icon } from "@/app/components/icon";
 
 const getEmptyEntry = (username: string) => ({
   id: "",
@@ -151,13 +150,7 @@ export default function Home() {
       )
     );
 
-    if (!prevUsername) await handleUsernameChangeDebounced(value, prevUsername);
-  };
-  const onUsernameFocusChange = async (isFocused: boolean) => {
-    if (!isFocused) {
-      const prevUsername = cookies.username as string | undefined;
-      await handleUsernameChange(username, prevUsername ?? "");
-    }
+    await handleUsernameChangeDebounced(value, prevUsername);
   };
 
   const handleUpdateEntry = useDebouncedCallback(
@@ -244,7 +237,6 @@ export default function Home() {
           onChange={onUsernameValueChange}
           variant="outlined"
           isDisabled={!!loading}
-          onFocusChange={onUsernameFocusChange}
         />
 
         <div
