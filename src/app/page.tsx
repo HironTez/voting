@@ -165,27 +165,26 @@ export default function Home() {
     onUpdateMessage
   );
 
-  const handleUsernameChange = async (username: string) => {
-    if (!username || username == cookieUsername) {
-      setUsernameErrorMessage(undefined);
-      return;
-    }
-
-    autoLoading(async () => {
-      const result = await upsertUsername(username, cookieUsername);
-      if (result.success && usernameErrorMessage !== undefined) {
+  const handleUsernameChangeDebounced = useDebouncedCallback(
+    async (username: string) => {
+      if (!username || username == cookieUsername) {
         setUsernameErrorMessage(undefined);
-      } else if (!result.success) {
-        setUsernameErrorMessage(result.error);
         return;
       }
 
-      await getEntries();
-      setCookie(usernameTag, username);
-    });
-  };
-  const handleUsernameChangeDebounced = useDebouncedCallback(
-    handleUsernameChange,
+      autoLoading(async () => {
+        const result = await upsertUsername(username, cookieUsername);
+        if (result.success && usernameErrorMessage !== undefined) {
+          setUsernameErrorMessage(undefined);
+        } else if (!result.success) {
+          setUsernameErrorMessage(result.error);
+          return;
+        }
+
+        await getEntries();
+        setCookie(usernameTag, username);
+      });
+    },
     2000
   );
 
@@ -195,14 +194,34 @@ export default function Home() {
     await handleUsernameChangeDebounced(value);
   };
 
-  const handleUpdateEntry = useDebouncedCallback(
-    async (id: string, value: string) => {
-      autoLoading(async () => {
-        await updateEntry(id, value, cookieUsername);
-      });
-    },
+  const handleUpdateEntry = async (id: string, value: string) => {
+    autoLoading(async () => {
+      await updateEntry(id, value, cookieUsername);
+    });
+  };
+
+  const handleUpdateEntryDebounced = useDebouncedCallback(
+    handleUpdateEntry,
     3000
   );
+
+  const onEntryChange = (entry: Entry, text: string) => {
+    setEntry(
+      {
+        ...entry,
+        text,
+      },
+      entry.id
+    );
+    handleUpdateEntryDebounced(entry.id, text);
+  };
+
+  const onEntryFocusChanged = (focused: boolean) => {
+    if (!focused) {
+      handleUpdateEntryDebounced.flush();
+    }
+  };
+
   const handleDeleteEntry = async (entry: Entry) => {
     const toastMessageSuffix = entry.text && `: ${truncateText(entry.text)}`;
     const toastMessage = `Удалено${toastMessageSuffix || " пустую запись"}`;
@@ -297,15 +316,9 @@ export default function Home() {
                       type="textarea"
                       value={entry.text}
                       onChange={(value: string) => {
-                        setEntry(
-                          {
-                            ...entry,
-                            text: value,
-                          },
-                          entry.id
-                        );
-                        handleUpdateEntry(entry.id, value);
+                        onEntryChange(entry, value);
                       }}
+                      onFocusChange={onEntryFocusChanged}
                       variant="filled"
                       isDisabled={!!loading}
                     />
@@ -361,3 +374,5 @@ export default function Home() {
     </div>
   );
 }
+
+// TODO: restore focus after loading
