@@ -233,6 +233,7 @@ export default function Home() {
         <TextField
           label="Имя"
           type="text"
+          name="name"
           value={username}
           onChange={onUsernameValueChange}
           variant="outlined"
