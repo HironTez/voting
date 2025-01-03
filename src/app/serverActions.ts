@@ -70,7 +70,29 @@ export const upsertUsername = async (
   if (username == prevUsername) return { success: true };
 
   const existing = await prisma.user.findUnique({ where: { username } });
-  if (existing) return { success: false, error: "Это имя уже занято" };
+  if (existing) {
+    const hasEntriesPrevious = !!(await prisma.user.findUnique({
+      where: {
+        username: prevUsername,
+        OR: [
+          { entries: { some: {} } },
+          { modifiedEntries: { some: {} } },
+          { votes: { some: {} } },
+        ],
+      },
+    }));
+    // If the previous user has already made some actions, we can't delete it
+    if (hasEntriesPrevious) {
+      return { success: false, error: "Это имя уже занято" };
+    }
+    // If the previous user has no actions, we can delete it and give access to the target one
+    else {
+      return await prisma.user
+        .delete({ where: { username: prevUsername } })
+        .then(() => ({ success: true }))
+        .catch(() => ({ success: false, error: "Не удалось изменить имя" }));
+    }
+  }
 
   return await prisma.user
     .upsert({
@@ -78,11 +100,7 @@ export const upsertUsername = async (
       update: { username },
       where: { username: prevUsername },
     })
-    .then((user) =>
-      user.username === username
-        ? { success: true }
-        : { success: false, error: "Не удалось изменить имя" }
-    )
+    .then(() => ({ success: true }))
     .catch(() => ({ success: false, error: "Не удалось изменить имя" }));
 };
 
