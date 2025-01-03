@@ -88,10 +88,8 @@ export const upsertUsername = async (
     // If the previous user has no actions, we can delete it and give access to the target
     // If the previous user doesn't exist, we just give access to the target
     else {
-      return await prisma.user
-        .delete({ where: { username: prevUsername } })
-        .then(() => ({ success: true }))
-        .catch(() => ({ success: true }));
+      await prisma.user.delete({ where: { username: prevUsername } });
+      return { success: true };
     }
   }
 
