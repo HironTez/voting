@@ -90,7 +90,8 @@ export const upsertUsername = async (
     else {
       return await prisma.user
         .delete({ where: { username: prevUsername } })
-        .finally(() => ({ success: true }));
+        .then(() => ({ success: true }))
+        .catch(() => ({ success: true }));
     }
   }
 
