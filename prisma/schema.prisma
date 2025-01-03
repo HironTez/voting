@@ -27,11 +27,11 @@ model Entry {
 
     createdAt   DateTime @default(now())
     createdById String   @db.ObjectId
-    createdBy   User     @relation("entries", fields: [createdById], references: [id])
+    createdBy   User     @relation("entries", fields: [createdById], references: [id], onDelete: Cascade)
 
     updatedAt   DateTime @updatedAt
     updatedById String?  @db.ObjectId
-    updatedBy   User?    @relation("modified", fields: [updatedById], references: [id])
+    updatedBy   User?    @relation("modified", fields: [updatedById], references: [id], onDelete: Cascade)
 
     voters   User[]   @relation("votes", fields: [voterIds], references: [id])
     voterIds String[] @db.ObjectId

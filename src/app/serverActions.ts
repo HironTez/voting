@@ -45,6 +45,13 @@ export const updateEntry = async (
 };
 
 export const deleteEntry = async (id: string) => {
+  // Disconnect all voter relations before deleting the entry
+  // because Prisma doesn't disconnect many-to-many relations
+  // automatically on delete
+  await prisma.entry.update({
+    where: { id },
+    data: { voters: { set: [] } },
+  });
   await prisma.entry.delete({ where: { id } });
 
   await sendUpdateMessage(id);
