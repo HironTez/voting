@@ -71,6 +71,12 @@ export const upsertUsername = async (
 
   const existing = await prisma.user.findUnique({ where: { username } });
   if (existing) {
+    const previous = await prisma.user.findUnique({
+      where: { username: prevUsername },
+    });
+    // If not found the previous user, give access to the target
+    if (!previous) return { success: true };
+
     const hasEntriesPrevious = !!(await prisma.user.findUnique({
       where: {
         username: prevUsername,
@@ -85,7 +91,7 @@ export const upsertUsername = async (
     if (hasEntriesPrevious) {
       return { success: false, error: "Это имя уже занято" };
     }
-    // If the previous user has no actions, we can delete it and give access to the target one
+    // If the previous user has no actions, we can delete it and give access to the target
     else {
       return await prisma.user
         .delete({ where: { username: prevUsername } })
